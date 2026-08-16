@@ -65,6 +65,39 @@ function PlayIcon() {
   );
 }
 
+function HomeIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-2">
+      <path d="m3 11 9-8 9 8v9a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" />
+    </svg>
+  );
+}
+
+function GridIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-2">
+      <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+    </svg>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-2">
+      <path d="M12 16V4m0 0L7 9m5-5 5 5M4 15v5h16v-5" />
+    </svg>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-2">
+      <circle cx="12" cy="8" r="4" /><path d="M4 21c.8-4.2 3.5-6 8-6s7.2 1.8 8 6" />
+    </svg>
+  );
+}
+
 function MovieCard({ movie }: { movie: Movie }) {
   return (
     <Link href={`/movie/${movie.title.toLowerCase().replaceAll(" ", "-")}`} className="group block min-w-0">
@@ -79,13 +112,13 @@ function MovieCard({ movie }: { movie: Movie }) {
         </span>
       </div>
       <div className="pt-3">
-        <h3 className="truncate text-sm font-semibold text-zinc-100 transition group-hover:text-red-400 sm:text-[15px]">{movie.title}</h3>
-        <div className="mt-1.5 flex items-center gap-2 text-xs text-zinc-500">
-          <span className="font-semibold text-emerald-500">{movie.rating}% match</span>
+        <h3 className="truncate text-xs font-semibold text-zinc-100 transition group-hover:text-red-400 sm:text-[15px]">{movie.title}</h3>
+        <div className="mt-1.5 flex min-w-0 items-center gap-1.5 text-[10px] text-zinc-500 sm:gap-2 sm:text-xs">
+          <span className="shrink-0 font-semibold text-emerald-500">{movie.rating}%</span>
           <span>•</span>
           <span>{movie.year}</span>
-          <span>•</span>
-          <span>{movie.genre}</span>
+          <span className="hidden sm:inline">•</span>
+          <span className="hidden truncate sm:inline">{movie.genre}</span>
         </div>
       </div>
     </Link>
@@ -104,7 +137,7 @@ function UploadedMovieCard({ movie }: { movie: UploadedMovie }) {
       <div className="aspect-video overflow-hidden rounded-lg border border-white/10 bg-black shadow-lg shadow-black/30">
         {isVideo ? (
           <video
-            className="h-full w-full bg-black object-contain"
+            className="h-full w-full bg-black object-cover"
             controls
             preload="metadata"
             playsInline
@@ -126,6 +159,35 @@ function UploadedMovieCard({ movie }: { movie: UploadedMovie }) {
         <span className="shrink-0">{formatFileSize(movie.fileSize)}</span>
       </div>
     </article>
+  );
+}
+
+function UploadedMoviesSection({
+  movies,
+  id,
+  className = "py-9",
+}: {
+  movies: UploadedMovie[];
+  id: string;
+  className?: string;
+}) {
+  if (!movies.length) {
+    return null;
+  }
+
+  return (
+    <section id={id} className={`scroll-mt-36 border-b border-white/10 ${className}`}>
+      <div className="mb-5 flex items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-500">From your library</p>
+          <h2 className="mt-1 text-xl font-bold sm:text-2xl">Uploaded movies</h2>
+        </div>
+        <span className="text-xs text-zinc-600">{movies.length} available</span>
+      </div>
+      <div className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {movies.map((movie) => <UploadedMovieCard key={movie.id} movie={movie} />)}
+      </div>
+    </section>
   );
 }
 
@@ -156,7 +218,7 @@ export default function PublicHome({ uploadedMovies }: { uploadedMovies: Uploade
   }
 
   return (
-    <div className="min-h-screen bg-[#090a0d] text-white">
+    <div className="min-h-screen bg-[#090a0d] pb-20 text-white md:pb-0">
       <header className="sticky top-0 z-50 border-b border-white/10 bg-[#090a0d]/95 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1500px] items-center gap-3 px-4 sm:px-6">
           <button
@@ -217,6 +279,8 @@ export default function PublicHome({ uploadedMovies }: { uploadedMovies: Uploade
       </header>
 
       <main className="mx-auto max-w-[1500px] px-4 pb-16 sm:px-6">
+        <UploadedMoviesSection movies={visibleUploads} id="uploads" className="py-6 md:hidden" />
+
         <section className="py-8 sm:py-10">
           <div className="mb-5 flex items-end justify-between">
             <div>
@@ -254,20 +318,7 @@ export default function PublicHome({ uploadedMovies }: { uploadedMovies: Uploade
           </div>
         </div>
 
-        {visibleUploads.length ? (
-          <section id="uploads" className="scroll-mt-36 border-b border-white/10 py-9">
-            <div className="mb-5 flex items-end justify-between gap-4">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-red-500">From your library</p>
-                <h2 className="mt-1 text-xl font-bold sm:text-2xl">Uploaded movies</h2>
-              </div>
-              <span className="text-xs text-zinc-600">{visibleUploads.length} available</span>
-            </div>
-            <div className="grid grid-cols-1 gap-x-4 gap-y-8 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {visibleUploads.map((movie) => <UploadedMovieCard key={movie.id} movie={movie} />)}
-            </div>
-          </section>
-        ) : null}
+        <UploadedMoviesSection movies={visibleUploads} id="uploads-desktop" className="hidden py-9 md:block" />
 
         <section id="latest" className="scroll-mt-36 py-9">
           <div className="mb-5 flex items-center justify-between">
@@ -280,7 +331,7 @@ export default function PublicHome({ uploadedMovies }: { uploadedMovies: Uploade
             </button>
           </div>
           {visibleMovies.length ? (
-            <div className="grid grid-cols-1 gap-x-4 gap-y-8 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+            <div className="grid grid-cols-1 gap-x-3 gap-y-7 sm:grid-cols-2 sm:gap-x-4 sm:gap-y-8 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
               {visibleMovies.map((movie) => <MovieCard key={movie.title} movie={movie} />)}
             </div>
           ) : (
@@ -299,7 +350,7 @@ export default function PublicHome({ uploadedMovies }: { uploadedMovies: Uploade
               <p className="mt-0.5 text-xs text-zinc-500">What viewers are watching today</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-x-4 gap-y-8 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+          <div className="grid grid-cols-1 gap-x-3 gap-y-7 sm:grid-cols-2 sm:gap-x-4 sm:gap-y-8 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             {[movies[3], movies[0], movies[7], movies[5], movies[1]].map((movie) => <MovieCard key={`trending-${movie.title}`} movie={movie} />)}
           </div>
         </section>
@@ -322,6 +373,25 @@ export default function PublicHome({ uploadedMovies }: { uploadedMovies: Uploade
       <footer className="border-t border-white/10 px-5 py-8 text-center text-xs text-zinc-600">
         <p>© 2026 AVAI · Movies for every mood</p>
       </footer>
+
+      <nav aria-label="Mobile navigation" className="fixed inset-x-0 bottom-0 z-50 grid h-16 grid-cols-4 border-t border-white/10 bg-[#0c0d11]/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">
+        <Link href="/" className="flex flex-col items-center justify-center gap-1 text-[10px] font-semibold text-white">
+          <HomeIcon />
+          <span>Home</span>
+        </Link>
+        <Link href="#latest" className="flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-zinc-500 transition active:text-white">
+          <GridIcon />
+          <span>Latest</span>
+        </Link>
+        <Link href="#uploads" className="flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-zinc-500 transition active:text-white">
+          <UploadIcon />
+          <span>Uploads</span>
+        </Link>
+        <Link href="/admin" className="flex flex-col items-center justify-center gap-1 text-[10px] font-medium text-zinc-500 transition active:text-white">
+          <UserIcon />
+          <span>Admin</span>
+        </Link>
+      </nav>
     </div>
   );
 }
